@@ -36,11 +36,14 @@ public class stringCalculator {
         // parse ints and add to total
         try {
             for (String entry: stringArray) {
-                if (Integer.parseInt(entry.strip()) < 0) {
+                int numFound = Integer.parseInt(entry.strip());
+                if (numFound < 0) {
                     throw new Exception("Negative numbers are not allowed.  " +
-                            "Negative number found: " + Integer.parseInt(entry.strip()));
+                            "Negative number found: " + numFound);
                 }
-                total += Integer.parseInt(entry.strip());
+                if (numFound <= 1000) {
+                    total += Integer.parseInt(entry.strip());
+                }
             }
         }
         catch (NumberFormatException e){
@@ -82,13 +85,17 @@ public class stringCalculator {
         inputs.put(6, new String[]{"  1,\t 2, \n  3  ", "white space including tab and newline characters"});
 
         // testing for Q3
-        inputs.put(2, new String[]{"//&\n1&1", "two numbers separated by single &"});
+        inputs.put(3, new String[]{"//&\n1&2", "two numbers separated by single &"});
         inputs.put(13, new String[]{"//@\n2@3@8", "three numbers separated by @"});
-        inputs.put(3, new String[]{"//&&\n1&&2", "separated by double &&"});
+        inputs.put(5, new String[]{"//&&\n3&&2", "separated by double &&"});
 
-        // testing for Q4
+        // testing for Q4 ; should print exception to console
         inputs.put(-1, new String[]{"-1, -1", "two neg numbers separated by default delim"});
         inputs.put(-2, new String[]{"//@\n-2@3@8", "one neg number, one positive number, separated by custom delim"});
+
+        // test bonus 1
+        inputs.put(2, new String[]{"2,1001", "Should ignore number greater than 1000"});
+        inputs.put(1008, new String[]{"8,1000", "Should not ignore number <= 1000"});
 
 
         for (Map.Entry<Integer, String[]> entry : inputs.entrySet()){
