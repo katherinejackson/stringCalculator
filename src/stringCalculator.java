@@ -1,12 +1,10 @@
+// Katherine Jackson
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 public class stringCalculator {
-
-
-    public stringCalculator(){}
-
 
     /**
      /**
@@ -17,49 +15,53 @@ public class stringCalculator {
      *               string of numbers separated deliminator specified at the beginning of the string
      *               format: “//[delimiter]\n[delimiter separated numbers]”
      * @return : int value (the value of the numbers added together)
+     * @throws Exception : throws exception if negative number found
      */
-    public static int add(String numbers) {
+    public static int add(String numbers) throws Exception{
         String[] stringArray;
         int total = 0;
+
         if (numbers.equals("")) {
             return 0;
         }
 
+        // determine where to split, and make into string array
         if (numbers.startsWith("//")) {
-            return customAdd(numbers);
+            stringArray = customAdd(numbers);
+        }
+        else {
+            stringArray = numbers.split(",");
         }
 
+        // parse ints and add to total
         try {
-            stringArray = numbers.split(",");
             for (String entry: stringArray) {
+                if (Integer.parseInt(entry.strip()) < 0) {
+                    throw new Exception("Negative numbers are not allowed.  " +
+                            "Negative number found: " + Integer.parseInt(entry.strip()));
+                }
                 total += Integer.parseInt(entry.strip());
             }
         }
-        catch (Exception e){
-            System.out.println("Exception thrown: " + e.toString());
+        catch (NumberFormatException e){
+            System.out.println(e.toString());
         }
         return total;
     }
 
-    private static int customAdd(String numbers) {
+    /**
+     * Helper function; parse string with custom deliminators
+     * @param numbers : String; format: “//[delimiter]\n[delimiter separated numbers]”
+     * @return : String array of numbers found
+     */
+    private static String[] customAdd(String numbers){
         String[] stringArray;
-        int total = 0;
 
         int index = numbers.indexOf("\n");
-//        System.out.println(index);
         CharSequence delim = numbers.subSequence(2, index);
-//        System.out.println(delim);
 
-        try {
-            stringArray = numbers.split((String) delim);
-            for (int i = 1; i < stringArray.length; i++) {
-                total += Integer.parseInt(stringArray[i].strip());
-            }
-        }
-        catch (Exception e){
-            System.out.println("Exception thrown: " + e.toString());
-        }
-        return total;
+        stringArray = numbers.split((String) delim);
+        return Arrays.copyOfRange(stringArray, 1, stringArray.length);
 
     }
 
@@ -84,17 +86,25 @@ public class stringCalculator {
         inputs.put(13, new String[]{"//@\n2@3@8", "three numbers separated by @"});
         inputs.put(3, new String[]{"//&&\n1&&2", "separated by double &&"});
 
+        // testing for Q4
+        inputs.put(-1, new String[]{"-1, -1", "two neg numbers separated by default delim"});
+        inputs.put(-2, new String[]{"//@\n-2@3@8", "one neg number, one positive number, separated by custom delim"});
 
 
         for (Map.Entry<Integer, String[]> entry : inputs.entrySet()){
-            result = add(entry.getValue()[0]);
-            if (result != entry.getKey()) {
-                numErrors ++;
-                System.out.println("Error " + numErrors +
-                        "\ninput: " + entry.getValue()[0] +
-                        "\nExpected Output: " + entry.getKey() +
-                        "\nActual Output: " + result +
-                        "\nReason for test: " + entry.getValue()[1] + "\n\n");
+            try {
+                result = add(entry.getValue()[0]);
+                if (result != entry.getKey()) {
+                    numErrors++;
+                    System.out.println("Error " + numErrors +
+                            "\ninput: " + entry.getValue()[0] +
+                            "\nExpected Output: " + entry.getKey() +
+                            "\nActual Output: " + result +
+                            "\nReason for test: " + entry.getValue()[1] + "\n\n");
+                }
+            }
+            catch (Exception e){
+                System.out.println(e.toString());
             }
         }
 
